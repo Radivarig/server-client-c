@@ -30,8 +30,9 @@ int main(int argc, char *argv[])
     char buffer[256];
     struct sockaddr_in serv_addr, cli_addr;
     
-    if (argc < 2)
-        error("no port provided");
+    if (argc < 2) error("no port provided");
+
+    //if(argv[2] == "dcp")
 
     //SOCK_STREAM is UTP, SOCK_DGRAM is DCP
     sock_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -60,9 +61,7 @@ int main(int argc, char *argv[])
 
     int msg_recieved = 0;
 
-    int keep_listen = 1;
-
-    while(keep_listen){
+    while(1){
         listen(sock_fd, 5);
 
         cli_len = sizeof(cli_addr);
@@ -76,16 +75,21 @@ int main(int argc, char *argv[])
         if (new_sock_fd < 0) error("on accept");
         
         bzero(buffer,256);
-        
         int n = read(new_sock_fd, buffer, 255);
         if (n < 0) error("reading from socket");
+        else{
+            ++msg_recieved;
+            //printf("message(%i): %s\n",msg_recieved, buffer);
+        }
         
-        ++msg_recieved;
-        printf("message(%i): %s\n",msg_recieved, buffer);
-        
-        n = write(new_sock_fd,"bla", 18);
-        if (n < 0) error("writing to socket");
-    
+        //n = write(new_sock_fd, "bla", 18);
+        //if (n < 0) error("errorwriting to socket");
+
+        if(strcmp(buffer, "done.")){
+            --msg_recieved;
+            printf("messages recieved: %i\n", msg_recieved);
+            break;
+        }
     }
 
     close(new_sock_fd);
