@@ -45,21 +45,28 @@ int main(int argc, char *argv[])
     );
     serv_addr.sin_port = htons(port_no);
     
-    if (connect(
-            sock_fd,
-            (struct sockaddr *) &serv_addr,sizeof(serv_addr)) 
-        < 0) 
-        error("ERROR connecting");
+    int n, i;
+    char *msg = "msg";
+    for(i = 0; i < 10; ++i){
+        if (connect(
+                sock_fd,
+                (struct sockaddr *) &serv_addr,sizeof(serv_addr)) 
+            < 0) 
+            error("ERROR connecting");
+        
+        n = write(sock_fd, msg, strlen(msg));
+        if (n < 0) error("ERROR writing to socket");
+    }
+    // printf("Please enter the message: ");
+    //bzero(buffer,256);
+    //fgets(buffer,255,stdin);
+    //int n = write(sock_fd,buffer,strlen(buffer));
     
-    printf("Please enter the message: ");
-    bzero(buffer,256);
-    fgets(buffer,255,stdin);
-    
-    int n = write(sock_fd,buffer,strlen(buffer));
-    if (n < 0) error("ERROR writing to socket");
-    
-    bzero(buffer,256);
+    msg = "done.";
+    n = write(sock_fd, msg, strlen(msg));
+        if (n < 0) error("ERROR writing to socket");
 
+    //bzero(buffer,256);
     //n = read(sock_fd,buffer,255);
     //if (n < 0) error("ERROR reading from socket");
     //printf("%s\n",buffer);

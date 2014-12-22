@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         if (n < 0) error("reading from socket");
         else{
             ++msg_recieved;
-            //printf("message(%i): %s\n",msg_recieved, buffer);
+            printf("message(%i): %s\n",msg_recieved, buffer);
         }
         
         //n = write(new_sock_fd, "bla", 18);
