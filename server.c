@@ -57,28 +57,37 @@ int main(int argc, char *argv[])
     while(passed_sec < 5){
         passed_sec = difftime(time(NULL), start_time);
     }*/
-    
-    listen(sock_fd, 5);
-    cli_len = sizeof(cli_addr);
-    
-    new_sock_fd = accept(
-        sock_fd, 
-        (struct sockaddr *) &cli_addr, 
-        &cli_len
-    );
 
-    if (new_sock_fd < 0) error("on accept");
+    int msg_recieved = 0;
+
+    int keep_listen = 1;
+
+    while(keep_listen){
+        listen(sock_fd, 5);
+
+        cli_len = sizeof(cli_addr);
+        
+        new_sock_fd = accept(
+            sock_fd,
+            (struct sockaddr *) &cli_addr,
+            &cli_len
+        );
+
+        if (new_sock_fd < 0) error("on accept");
+        
+        bzero(buffer,256);
+        
+        int n = read(new_sock_fd, buffer, 255);
+        if (n < 0) error("reading from socket");
+        
+        ++msg_recieved;
+        printf("message(%i): %s\n",msg_recieved, buffer);
+        
+        n = write(new_sock_fd,"bla", 18);
+        if (n < 0) error("writing to socket");
     
-    bzero(buffer,256);
-    
-    int n = read(new_sock_fd, buffer, 255);
-    if (n < 0) error("reading from socket");
-    
-    printf("Here is the message: %s\n", buffer);
-   
-    n = write(new_sock_fd,"bla", 18);
-    if (n < 0) error("writing to socket");
-    
+    }
+
     close(new_sock_fd);
     close(sock_fd);
     return 0;
